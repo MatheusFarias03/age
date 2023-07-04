@@ -4174,6 +4174,13 @@ STABLE
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
 
+CREATE FUNCTION ag_catalog.age_shortest_path(agtype)
+RETURNS agtype
+LANGUAGE c 
+STABLE
+PARALLEL SAFE
+AS 'MODULE_PATHNAME';
+
 CREATE FUNCTION ag_catalog.age_range(variadic "any")
 RETURNS agtype
 LANGUAGE c

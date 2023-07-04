@@ -10001,6 +10001,55 @@ Datum age_relationships(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(agtype_value_to_agtype(agis_result.res));
 }
 
+PG_FUNCTION_INFO_V1(age_shortest_path);
+/*
+ * Function for finding the shortest path between two vertices.
+ */ 
+Datum age_shortest_path(PG_FUNCTION_ARGS)
+{
+    agtype *agt_arg = NULL;
+    agtype_value *agtv_path = NULL;
+    agtype_in_state agis_result;
+
+    /* check for null */
+    if (PG_ARGISNULL(0))
+    {
+        PG_RETURN_NULL();
+    }
+
+    agt_arg = AG_GET_ARG_AGTYPE_P(0);
+
+    /* check for a scalar object */
+    if (!AGT_ROOT_IS_SCALAR(agt_arg))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+                 errmsg("shortest_path() argument must resolve to a scalar value")));
+    }
+
+    /* get the potential path out of the array */
+    agtv_path = get_ith_agtype_value_from_container(&agt_arg->root, 0);
+
+    /* is it an agtype null? */
+    if (agtv_path->type == AGTV_NULL)
+    {
+            PG_RETURN_NULL();
+    }
+
+    /* verify that it is an agtype path */
+    if (agtv_path->type != AGTV_PATH)
+        ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+                        errmsg("shortest_path() argument must be a path")));
+
+    /* 
+     * TODO: Use the age_relationships() function to retrive all the paths.
+     * After that, an ORDER BY must be called, followed by a LIMIT 1 so that 
+     * we can find THE shortest path.
+     */
+
+    PG_RETURN_POINTER(agtype_value_to_agtype(agis_result.res));
+}
+
 /*
  * Helper function to convert an integer type (PostgreSQL or agtype) datum into
  * an int64. The function will flag if an agtype null was found. The function
